@@ -53,6 +53,8 @@ function loadData() {
             items.push(articleEle);
         });
         $("#nytimes-articles").append(items);//.join("")
+    }).fail(function(err) {
+        $("#nytimes-articles").append($(document.createElement("h1")).text("New York Times Articles Could Not Be Loaded"));
     });
     // $.ajax({
     //     url: NYSearchArticleURL,
