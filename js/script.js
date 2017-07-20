@@ -15,12 +15,12 @@ function loadData() {
     var streetStr = $('#street').val();
     var cityStr = $('#city').val();
     if (!streetStr || !cityStr) {
-        streetStr = "46.414382",
-            cityStr = "10.013988"
+        streetStr = "30 rockefeller center",
+            cityStr = "new york city, ny"
     }
     var address = streetStr + ', ' + cityStr;
     $greeting.text('So, you want to live at ' + address + '?');
-    // YOUR CODE GOES HERE!
+
     var url = 'https://maps.googleapis.com/maps/api/streetview?size=600x400&';
     var locationFilter = 'location=' + address;
     url = url + locationFilter;
@@ -39,10 +39,10 @@ function loadData() {
         'sort': "newest",
         'page': 0
     });
-    $.getJSON(NYSearchArticleURL, function (data) {
+    $.getJSON(NYSearchArticleURL, function(data) {
         var docs = data.response.docs;
         var items = [];
-        $.each(docs, function (index, doc) {
+        $.each(docs, function(index, doc) {
             var articleEle = $(document.createElement('li')).addClass("article");
             var articleA = $(document.createElement('a'))
                 .attr({ href: doc.web_url })
@@ -52,18 +52,36 @@ function loadData() {
             articleEle.append(articleA, articleP);
             items.push(articleEle);
         });
-        $("#nytimes-articles").append(items);//.join("")
+        $("#nytimes-articles").append(items); //.join("")
     }).fail(function(err) {
         $("#nytimes-articles").append($(document.createElement("h1")).text("New York Times Articles Could Not Be Loaded"));
     });
-    // $.ajax({
-    //     url: NYSearchArticleURL,
-    //     method: 'GET',
-    // }).done(function(result) {
-    //     console.log(result);
-    // }).fail(function(err) {
-    //     throw err;
-    // });
+
+    //Wikipedia API call goes here!
+    var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + cityStr + '&format=json&callback=wikiCallback'; //with or without the callback=wikiCallback are all ok, why
+    $.ajax({
+        url: wikiUrl,
+        dataType: 'jsonp',
+        success: function(response) {
+            var articleList = response[1];
+
+            for (var i = 0; i < articleList.length; i++) {
+                articleStr = articleList[i];
+                var url = 'http://en/wikipedia.prg/wiki/' + articleStr;
+                $wikiElem.append(
+                    $(document.createElement('li')).append(
+                        $(document.createElement('a')
+                            .attr({ href: url })
+                            .text(articleStr))
+                    )
+                );
+            }
+        }
+    })
+
+    function onWikiJSONPLoad() {
+
+    };
 
     return false;
 };
