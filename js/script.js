@@ -59,6 +59,10 @@ function loadData() {
 
     //Wikipedia API call goes here!
     var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + cityStr + '&format=json&callback=wikiCallback'; //with or without the callback=wikiCallback are all ok, why
+
+    var wikiRequestTimeout = setTimeout(function() {
+        $wikiElem.text("failed to get wikipedia resources");
+    }, 8000);
     $.ajax({
         url: wikiUrl,
         dataType: 'jsonp',
@@ -70,12 +74,13 @@ function loadData() {
                 var url = 'http://en/wikipedia.prg/wiki/' + articleStr;
                 $wikiElem.append(
                     $(document.createElement('li')).append(
-                        $(document.createElement('a')
-                            .attr({ href: url })
-                            .text(articleStr))
+                        $(document.createElement('a'))
+                        .attr({ href: url })
+                        .text(articleStr)
                     )
                 );
             }
+            clearTimeout(wikiRequestTimeout);
         }
     })
 
