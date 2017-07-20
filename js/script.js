@@ -14,6 +14,10 @@ function loadData() {
     // load streetview
     var streetStr = $('#street').val();
     var cityStr = $('#city').val();
+    if (!streetStr || !cityStr) {
+        streetStr = "46.414382",
+            cityStr = "10.013988"
+    }
     var address = streetStr + ', ' + cityStr;
     $greeting.text('So, you want to live at ' + address + '?');
     // YOUR CODE GOES HERE!
@@ -27,19 +31,37 @@ function loadData() {
     $body.append(newImg);
 
     // Your NYTimes AJAX request goes HERE
-    $.getJSON();
+
     var NYSearchArticleURL = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
     NYSearchArticleURL += '?' + $.param({
-        'api-key': "376f99e151a14628be472f37e34a6956"
+        'api-key': NYSearchArticleAPIKEY,
+        'q': "China",
+        'sort': "newest",
+        'page': 0
     });
-    $.ajax({
-        url: NYSearchArticleURL,
-        method: 'GET',
-    }).done(function(result) {
-        console.log(result);
-    }).fail(function(err) {
-        throw err;
+    $.getJSON(NYSearchArticleURL, function (data) {
+        var docs = data.response.docs;
+        var items = [];
+        $.each(docs, function (index, doc) {
+            var articleEle = $(document.createElement('li')).addClass("article");
+            var articleA = $(document.createElement('a'))
+                .attr({ href: doc.web_url })
+                .text(doc.headline.main);
+            var articleP = $(document.createElement('p'))
+                .text(doc.snippet);
+            articleEle.append(articleA, articleP);
+            items.push(articleEle);
+        });
+        $("#nytimes-articles").append(items);//.join("")
     });
+    // $.ajax({
+    //     url: NYSearchArticleURL,
+    //     method: 'GET',
+    // }).done(function(result) {
+    //     console.log(result);
+    // }).fail(function(err) {
+    //     throw err;
+    // });
 
     return false;
 };
